@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\GestionController;
+use App\Http\Controllers\CarreraController;
 
 /*
 |--------------------------------------------------------------------------
@@ -27,4 +28,15 @@ Route::prefix('/gestiones')->group(function () {
     Route::post('/{id}/activar', [GestionController::class, 'activar']);
     Route::get('/activa', [GestionController::class, 'getActiva']);
     Route::delete('/{id}', [GestionController::class, 'destroy']);
+});
+
+// Rutas para Carreras
+Route::prefix('/carreras')->group(function () {
+    Route::get('/', [CarreraController::class, 'index']);
+    Route::post('/', [CarreraController::class, 'store']);
+    Route::get('/select', [CarreraController::class, 'getCarrerasForSelect']);
+    Route::get('/{id}', [CarreraController::class, 'show']);
+    Route::put('/{id}', [CarreraController::class, 'update']);
+    Route::delete('/{id}', [CarreraController::class, 'destroy']);
+    Route::post('/{id}/reactivar', [CarreraController::class, 'reactivar']); // Nueva ruta para reactivar
 });
