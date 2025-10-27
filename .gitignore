@@ -1,0 +1,15 @@
+# === Laravel ===
+/gestion_academica_backend/vendor/
+/gestion_academica_backend/node_modules/
+/gestion_academica_backend/storage/
+/gestion_academica_backend/.env
+/gestion_academica_backend/bootstrap/cache/
+
+# === React ===
+/gestion_acad_frontend/node_modules/
+/gestion_acad_frontend/dist/
+
+# === Global ===
+.DS_Store
+.env
+*.log
