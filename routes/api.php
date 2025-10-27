@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\GestionController;
 use App\Http\Controllers\CarreraController;
+use App\Http\Controllers\MateriaController;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,8 +26,9 @@ Route::get('/test', function () {
 Route::prefix('/gestiones')->group(function () {
     Route::get('/', [GestionController::class, 'index']);
     Route::post('/', [GestionController::class, 'store']);
-    Route::post('/{id}/activar', [GestionController::class, 'activar']);
     Route::get('/activa', [GestionController::class, 'getActiva']);
+    Route::put('/{id}', [GestionController::class, 'update']);
+    Route::post('/{id}/activar', [GestionController::class, 'activar']);
     Route::delete('/{id}', [GestionController::class, 'destroy']);
 });
 
@@ -39,4 +41,15 @@ Route::prefix('/carreras')->group(function () {
     Route::put('/{id}', [CarreraController::class, 'update']);
     Route::delete('/{id}', [CarreraController::class, 'destroy']);
     Route::post('/{id}/reactivar', [CarreraController::class, 'reactivar']); // Nueva ruta para reactivar
+});
+
+//Rutas para Materias
+Route::prefix('/materias')->group(function () {
+    Route::get('/', [MateriaController::class, 'index']);
+    Route::get('/select', [MateriaController::class, 'getMateriasForSelect']);
+    Route::get('/{id}', [MateriaController::class, 'show']);
+    Route::post('/', [MateriaController::class, 'store']);
+    Route::put('/{id}', [MateriaController::class, 'update']);
+    Route::delete('/{id}', [MateriaController::class, 'destroy']);
+    Route::post('/{id}/reactivar', [MateriaController::class, 'reactivar']);
 });

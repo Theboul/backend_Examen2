@@ -11,17 +11,23 @@ class Carrera extends Model
 
     protected $table = 'carrera';
     protected $primaryKey = 'id_carrera';
+    
+    // Laravel manejará automáticamente estos campos
+    const CREATED_AT = 'fecha_creacion';
+    const UPDATED_AT = 'fecha_modificacion';
 
     protected $fillable = [
         'nombre',
-        'codigo',
+        'sigla',
         'duracion_anios',
         'activo'
     ];
 
     protected $casts = [
         'activo' => 'boolean',
-        'duracion_anios' => 'integer'
+        'duracion_anios' => 'integer',
+        'fecha_creacion' => 'datetime',
+        'fecha_modificacion' => 'datetime'
     ];
 
     /**
@@ -61,6 +67,6 @@ class Carrera extends Model
      */
     public function puedeDesactivarse(): bool
     {
-        return !$this->todasLasMaterias()->where('activo', true)->exists();
+        return !$this->materias()->exists();
     }
 }

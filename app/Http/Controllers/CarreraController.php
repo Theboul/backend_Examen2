@@ -10,16 +10,18 @@ use Illuminate\Support\Facades\Validator;
 class CarreraController extends Controller
 {
     /**
-     * Obtener todas las carreras activas
+     * Obtener todas las carreras
      */
     public function index(Request $request)
     {
         try {
-            $query = Carrera::activas();
+            $query = Carrera::query();
 
-            // Si se solicita incluir inactivas
+            // Filtrar por estado
             if ($request->has('incluir_inactivas') && $request->boolean('incluir_inactivas')) {
-                $query = Carrera::withInactive();
+                // No filtrar, traer todas
+            } else {
+                $query->activas(); // Solo activas por defecto
             }
 
             $carreras = $query->orderBy('nombre')->get();
@@ -45,7 +47,6 @@ class CarreraController extends Controller
     public function store(Request $request)
     {
         try {
-            // Validar datos de entrada
             $validator = Validator::make($request->all(), [
                 'nombre' => 'required|string|max:150|unique:carrera,nombre',
                 'codigo' => 'required|string|max:20|unique:carrera,codigo',
@@ -70,19 +71,22 @@ class CarreraController extends Controller
 
             DB::beginTransaction();
 
-            // Crear la carrera
+            // Laravel maneja timestamps automáticamente
             $carrera = Carrera::create([
                 'nombre' => $request->nombre,
                 'codigo' => $request->codigo,
                 'duracion_anios' => $request->duracion_anios,
-                'activo' => true,
-                'fecha_creacion' => now(),
-                'fecha_modificacion' => now()
+                'activo' => true
+                // fecha_creacion y fecha_modificacion se manejan automáticamente
             ]);
 
             // Registrar en bitácora
-            $this->registrarBitacora('Carrera creada: ' . $carrera->nombre);
 
+            /**BitacoraController::registrar(
+                'CREAR',
+                'Carrera creada: ' . $carrera->nombre
+            );**/
+            
             DB::commit();
 
             return response()->json([
@@ -107,7 +111,7 @@ class CarreraController extends Controller
     public function show($id)
     {
         try {
-            $carrera = Carrera::withInactive()->find($id);
+            $carrera = Carrera::find($id);
 
             if (!$carrera) {
                 return response()->json([
@@ -137,7 +141,7 @@ class CarreraController extends Controller
     public function update(Request $request, $id)
     {
         try {
-            $carrera = Carrera::withInactive()->find($id);
+            $carrera = Carrera::find($id);
 
             if (!$carrera) {
                 return response()->json([
@@ -146,7 +150,6 @@ class CarreraController extends Controller
                 ], 404);
             }
 
-            // Validar datos de entrada (ignorar unique para el mismo registro)
             $validator = Validator::make($request->all(), [
                 'nombre' => 'required|string|max:150|unique:carrera,nombre,' . $id . ',id_carrera',
                 'codigo' => 'required|string|max:20|unique:carrera,codigo,' . $id . ',id_carrera',
@@ -171,16 +174,16 @@ class CarreraController extends Controller
 
             DB::beginTransaction();
 
-            // Actualizar la carrera
             $carrera->update([
                 'nombre' => $request->nombre,
                 'codigo' => $request->codigo,
-                'duracion_anios' => $request->duracion_anios,
-                'fecha_modificacion' => now()
+                'duracion_anios' => $request->duracion_anios
             ]);
 
-            // Registrar en bitácora
-            $this->registrarBitacora('Carrera actualizada: ' . $carrera->nombre);
+            /**BitacoraController::registrar(
+                'ACTUALIZAR',
+                'Carrera actualizada: ' . $carrera->nombre
+            );**/
 
             DB::commit();
 
@@ -217,7 +220,7 @@ class CarreraController extends Controller
 
             DB::beginTransaction();
 
-            // Verificar si la carrera tiene materias activas usando el método del modelo
+            // Verificar si puede ser desactivada
             if (!$carrera->puedeDesactivarse()) {
                 return response()->json([
                     'success' => false,
@@ -225,14 +228,15 @@ class CarreraController extends Controller
                 ], 400);
             }
 
-            // Desactivar la carrera (eliminación lógica)
-            $carrera->update([
-                'activo' => false,
-                'fecha_modificacion' => now()
-            ]);
+            // Desactivar (soft delete)
+            $carrera->update(['activo' => false]);
 
-            // Registrar en bitácora
             $this->registrarBitacora('Carrera desactivada: ' . $carrera->nombre);
+
+            /**BitacoraController::registrar(
+                'ELIMINAR',
+                'Carrera Eliminada: ' . $carrera->nombre
+            );**/
 
             DB::commit();
 
@@ -252,12 +256,12 @@ class CarreraController extends Controller
     }
 
     /**
-     * Reactivar una carrera previamente desactivada
+     * Reactivar una carrera
      */
     public function reactivar($id)
     {
         try {
-            $carrera = Carrera::withInactive()->where('activo', false)->find($id);
+            $carrera = Carrera::where('activo', false)->find($id);
 
             if (!$carrera) {
                 return response()->json([
@@ -268,14 +272,12 @@ class CarreraController extends Controller
 
             DB::beginTransaction();
 
-            // Reactivar la carrera
-            $carrera->update([
-                'activo' => true,
-                'fecha_modificacion' => now()
-            ]);
+            $carrera->update(['activo' => true]);
 
-            // Registrar en bitácora
-            $this->registrarBitacora('Carrera reactivada: ' . $carrera->nombre);
+            /**BitacoraController::registrar(
+                'REACTIVAR',
+                'Carrera reactivada: ' . $carrera->nombre
+            );**/
 
             DB::commit();
 
@@ -296,7 +298,7 @@ class CarreraController extends Controller
     }
 
     /**
-     * Obtener carreras para select/combobox (solo activas)
+     * Obtener carreras para select/combobox
      */
     public function getCarrerasForSelect()
     {
@@ -314,8 +316,7 @@ class CarreraController extends Controller
 
             return response()->json([
                 'success' => true,
-                'data' => $carreras,
-                'message' => 'Carreras para select obtenidas exitosamente'
+                'data' => $carreras
             ]);
 
         } catch (\Exception $e) {
@@ -325,23 +326,5 @@ class CarreraController extends Controller
                 'error' => $e->getMessage()
             ], 500);
         }
-    }
-
-    /**
-     * Función auxiliar para registrar en bitácora
-     */
-    private function registrarBitacora($accion)
-    {
-        // Implementación de bitácora según tu estructura
-        \Log::info('Bitácora: ' . $accion);
-        
-        // Ejemplo con tu tabla bitacora:
-        /*
-        DB::table('bitacora')->insert([
-            'id_perfil_usuario' => auth()->id() ?? 1, // Temporal para testing
-            'accion' => $accion,
-            'fecha' => now()
-        ]);
-        */
     }
 }

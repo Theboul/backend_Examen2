@@ -10,6 +10,9 @@ class Gestion extends Model
     use HasFactory;
 
     protected $table = 'gestion';
+    protected $primaryKey = 'id_gestion';
+    
+    public $timestamps = false;
     
     protected $fillable = [
         'anio',
@@ -39,10 +42,16 @@ class Gestion extends Model
     public function activar()
     {
         \DB::transaction(function () {
-            // Desactivar todas las gestiones
             self::where('activo', true)->update(['activo' => false]);
-            // Activar esta gestión
             $this->update(['activo' => true]);
         });
+    }
+    
+    /**
+     * Scope para gestiones activas
+     */
+    public function scopeActivas($query)
+    {
+        return $query->where('activo', true);
     }
 }
