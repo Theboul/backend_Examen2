@@ -5,6 +5,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\GestionController;
 use App\Http\Controllers\CarreraController;
 use App\Http\Controllers\MateriaController;
+use App\Http\Controllers\AulaController;
+use App\Http\Controllers\GrupoController;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,7 +24,7 @@ Route::get('/test', function () {
     return response()->json(['message' => 'API funcionando correctamente']);
 });
 
-// RUTAS DE GESTIONES - ESTAS SON LAS IMPORTANTES
+// Rutas para Gestiones
 Route::prefix('/gestiones')->group(function () {
     Route::get('/', [GestionController::class, 'index']);
     Route::post('/', [GestionController::class, 'store']);
@@ -52,4 +54,27 @@ Route::prefix('/materias')->group(function () {
     Route::put('/{id}', [MateriaController::class, 'update']);
     Route::delete('/{id}', [MateriaController::class, 'destroy']);
     Route::post('/{id}/reactivar', [MateriaController::class, 'reactivar']);
+});
+
+// Rutas para Aulas
+Route::prefix('/aulas')->group(function () {
+    Route::get('/', [AulaController::class, 'index']);
+    Route::post('/', [AulaController::class, 'store']);
+    Route::get('/select', [AulaController::class, 'getAulasForSelect']);
+    Route::get('/{id}', [AulaController::class, 'show']);
+    Route::put('/{id}', [AulaController::class, 'update']);
+    Route::delete('/{id}', [AulaController::class, 'destroy']);
+    Route::post('/{id}/reactivar', [AulaController::class, 'reactivar']);
+    Route::post('/{id}/toggle-mantenimiento', [AulaController::class, 'toggleMantenimiento']);
+});
+
+// Rutas para Grupos
+Route::prefix('/grupos')->group(function () {
+    Route::get('/', [GrupoController::class, 'index']);
+    Route::post('/', [GrupoController::class, 'store']);
+    Route::get('/select', [GrupoController::class, 'getGruposForSelect']);
+    Route::get('/{id}', [GrupoController::class, 'show']);
+    Route::put('/{id}', [GrupoController::class, 'update']);
+    Route::delete('/{id}', [GrupoController::class, 'destroy']);
+    Route::post('/{id}/reactivar', [GrupoController::class, 'reactivar']);
 });

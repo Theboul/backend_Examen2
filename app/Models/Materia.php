@@ -33,12 +33,11 @@ class Materia extends Model
     public function semestre()
     { return $this->belongsTo(Semestre::class, 'id_semestre'); }
 
-    // TODO: Descomentar cuando existan estos modelos
     // Relaciones hacia otros módulos
-    // public function grupos()
-    // { return $this->hasMany(Grupo::class, 'id_materia'); }
-    // public function materiaGrupos()
-    // { return $this->hasMany(MateriaGrupo::class, 'id_materia'); }
+    public function grupos()
+    { return $this->hasMany(Grupo::class, 'id_materia'); }
+    public function materiaGrupos()
+    { return $this->hasMany(MateriaGrupo::class, 'id_materia'); }
 
     // Scopes
     public function scopeActivas($q)
@@ -49,12 +48,8 @@ class Materia extends Model
     // Verifica si puede ser desactivada
     public function puedeDesactivarse(): bool
     {
-        // TODO: Descomentar cuando existan los modelos Grupo y MateriaGrupo
-        // $tieneGruposActivos = $this->grupos()->where('activo', true)->exists();
-        // $tieneMgActivos     = $this->materiaGrupos()->where('activo', true)->exists();
-        // return !$tieneGruposActivos && !$tieneMgActivos;
-        
-        // Por ahora permitir desactivar siempre
-        return true;
+        $tieneGruposActivos = $this->grupos()->where('activo', true)->exists();
+        $tieneMgActivos     = $this->materiaGrupos()->where('activo', true)->exists();
+        return !$tieneGruposActivos && !$tieneMgActivos;
     }
 }
