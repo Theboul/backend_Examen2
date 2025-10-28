@@ -7,6 +7,7 @@ use App\Http\Controllers\CarreraController;
 use App\Http\Controllers\MateriaController;
 use App\Http\Controllers\AulaController;
 use App\Http\Controllers\GrupoController;
+use App\Http\Controllers\DocenteController;
 
 /*
 |--------------------------------------------------------------------------
@@ -77,4 +78,15 @@ Route::prefix('/grupos')->group(function () {
     Route::put('/{id}', [GrupoController::class, 'update']);
     Route::delete('/{id}', [GrupoController::class, 'destroy']);
     Route::post('/{id}/reactivar', [GrupoController::class, 'reactivar']);
+});
+
+// Rutas para Docentes
+Route::prefix('/docentes')->group(function () {
+    Route::get('/', [DocenteController::class, 'index']);
+    Route::post('/', [DocenteController::class, 'store']);
+    Route::get('/select', [DocenteController::class, 'getDocentesForSelect']);
+    Route::get('/{id}', [DocenteController::class, 'show']);
+    Route::put('/{id}', [DocenteController::class, 'update']);
+    Route::delete('/{id}', [DocenteController::class, 'destroy']);
+    Route::post('/{id}/reactivar', [DocenteController::class, 'reactivar']);
 });

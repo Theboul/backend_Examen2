@@ -12,13 +12,20 @@ class User extends Authenticatable
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
+    protected $table = 'users';
+    protected $primaryKey = 'id_usuario';
+    
+    const CREATED_AT = 'fecha_creacion';
+    const UPDATED_AT = 'fecha_modificacion';
+
     /**
      * The attributes that are mass assignable.
      *
      * @var list<string>
      */
     protected $fillable = [
-        'name',
+        'id_rol',
+        'usuario',
         'email',
         'password',
     ];
@@ -30,7 +37,6 @@ class User extends Authenticatable
      */
     protected $hidden = [
         'password',
-        'remember_token',
     ];
 
     /**
@@ -41,8 +47,27 @@ class User extends Authenticatable
     protected function casts(): array
     {
         return [
-            'email_verified_at' => 'datetime',
+            'fecha_creacion' => 'datetime',
+            'fecha_modificacion' => 'datetime',
+            'primer_ingreso' => 'datetime',
+            'ultimo_acceso' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    // Relaciones
+    public function rol()
+    {
+        return $this->belongsTo(Rol::class, 'id_rol');
+    }
+
+    public function perfilUsuario()
+    {
+        return $this->hasOne(PerfilUsuario::class, 'id_usuario');
+    }
+
+    public function docente()
+    {
+        return $this->hasOne(Docente::class, 'id_usuario');
     }
 }

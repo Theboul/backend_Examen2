@@ -5,12 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class TipoContrato extends Model
+class Rol extends Model
 {
     use HasFactory;
 
-    protected $table = 'tipo_contrato';
-    protected $primaryKey = 'id_tipo_contrato';
+    protected $table = 'rol';
+    protected $primaryKey = 'id_rol';
     
     const CREATED_AT = 'fecha_creacion';
     const UPDATED_AT = 'fecha_modificacion';
@@ -18,20 +18,24 @@ class TipoContrato extends Model
     protected $fillable = [
         'nombre',
         'descripcion',
-        'hrs_minimas',
-        'hrs_maximas',
+        'activo',
     ];
 
     protected $casts = [
-        'hrs_minimas' => 'integer',
-        'hrs_maximas' => 'integer',
+        'activo' => 'boolean',
         'fecha_creacion' => 'datetime',
         'fecha_modificacion' => 'datetime',
     ];
 
     // Relaciones
-    public function docentes()
+    public function usuarios()
     {
-        return $this->hasMany(Docente::class, 'id_tipo_contrato');
+        return $this->hasMany(User::class, 'id_rol');
+    }
+
+    // Scopes
+    public function scopeActivos($query)
+    {
+        return $query->where('activo', true);
     }
 }
