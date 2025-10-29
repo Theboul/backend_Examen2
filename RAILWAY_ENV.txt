@@ -1,0 +1,27 @@
+APP_NAME=Sistema Académico Backend
+APP_ENV=production
+APP_KEY=base64:ZourYdmCK4NLx2gtgEIqeDzyP6aDnKljFhacIfvhsvo=
+APP_DEBUG=false
+APP_URL=https://web-production-a7d5d.up.railway.app
+
+LOG_CHANNEL=stack
+LOG_LEVEL=error
+
+DB_CONNECTION=pgsql
+DB_HOST=${{PGHOST}}
+DB_PORT=${{PGPORT}}
+DB_DATABASE=${{PGDATABASE}}
+DB_USERNAME=${{PGUSER}}
+DB_PASSWORD=${{PGPASSWORD}}
+
+SESSION_DRIVER=database
+SESSION_LIFETIME=120
+SESSION_ENCRYPT=false
+SESSION_PATH=/
+SESSION_DOMAIN=.up.railway.app
+SESSION_SECURE_COOKIE=true
+
+CACHE_STORE=database
+QUEUE_CONNECTION=database
+
+SANCTUM_STATEFUL_DOMAINS=localhost,127.0.0.1
