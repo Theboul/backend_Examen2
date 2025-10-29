@@ -3,7 +3,7 @@ nixPkgs = ['...', 'nginx']
 
 [phases.build]
 cmds = [
-  'composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader --no-scripts'
+  'composer install --no-interaction --prefer-dist --optimize-autoloader --no-scripts'
 ]
 
 [start]
