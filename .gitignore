@@ -33,6 +33,10 @@ GUIA_PRUEBAS.md
 verificacion_bd.sql
 fix_gestion_constraint.sql
 
+# Archivos de configuración sensibles
+RAILWAY_ENV.txt
+railway.env.example
+
 # Archivos de pruebas locales
 tests_api.http
 *.http
