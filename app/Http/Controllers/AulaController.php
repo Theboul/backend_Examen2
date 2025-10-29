@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Aula;
+use App\Models\Bitacora;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -117,8 +118,10 @@ class AulaController extends Controller
                 'activo' => true,
             ]);
 
-            // Registrar en bitácora
-            //$this->registrarBitacora('Aula creada: ' . $aula->nombre);
+            Bitacora::registrar(
+                'CREAR',
+                "Aula creada: {$aula->nombre} (Capacidad: {$aula->capacidad}) - ID: {$aula->id_aula}"
+            );
 
             DB::commit();
 
@@ -191,8 +194,10 @@ class AulaController extends Controller
                 'mantenimiento' => $request->mantenimiento ?? $aula->mantenimiento,
             ]);
 
-            // Registrar en bitácora
-            //$this->registrarBitacora('Aula actualizada: ' . $aula->nombre);
+            Bitacora::registrar(
+                'ACTUALIZAR',
+                "Aula actualizada: {$aula->nombre} (Capacidad: {$aula->capacidad}) - ID: {$aula->id_aula}"
+            );
 
             DB::commit();
 
@@ -243,8 +248,10 @@ class AulaController extends Controller
             // Desactivar el aula (eliminación lógica)
             $aula->update(['activo' => false]);
 
-            // Registrar en bitácora
-            //$this->registrarBitacora('Aula desactivada: ' . $aula->nombre);
+            Bitacora::registrar(
+                'DESACTIVAR',
+                "Aula desactivada: {$aula->nombre} - ID: {$aula->id_aula}"
+            );
 
             DB::commit();
 
@@ -283,8 +290,10 @@ class AulaController extends Controller
             // Reactivar el aula
             $aula->update(['activo' => true]);
 
-            // Registrar en bitácora
-            //$this->registrarBitacora('Aula reactivada: ' . $aula->nombre);
+            Bitacora::registrar(
+                'REACTIVAR',
+                "Aula reactivada: {$aula->nombre} - ID: {$aula->id_aula}"
+            );
 
             DB::commit();
 
@@ -365,8 +374,12 @@ class AulaController extends Controller
             $nuevoEstado = !$aula->mantenimiento;
             $aula->update(['mantenimiento' => $nuevoEstado]);
 
-            $accion = $nuevoEstado ? 'Aula puesta en mantenimiento' : 'Aula sacada de mantenimiento';
-            $this->registrarBitacora($accion . ': ' . $aula->nombre);
+            $accion = $nuevoEstado ? 'MANTENIMIENTO_ACTIVADO' : 'MANTENIMIENTO_DESACTIVADO';
+            $descripcion = $nuevoEstado 
+                ? "Aula puesta en mantenimiento: {$aula->nombre}" 
+                : "Aula sacada de mantenimiento: {$aula->nombre}";
+            
+            Bitacora::registrar($accion, $descripcion);
 
             DB::commit();
 
@@ -375,7 +388,7 @@ class AulaController extends Controller
             return response()->json([
                 'success' => true,
                 'data' => $aula,
-                'message' => $accion . ' exitosamente'
+                'message' => ($nuevoEstado ? 'Aula puesta en mantenimiento' : 'Aula sacada de mantenimiento') . ' exitosamente'
             ]);
 
         } catch (\Exception $e) {
@@ -385,22 +398,6 @@ class AulaController extends Controller
                 'message' => 'Error al cambiar estado de mantenimiento',
                 'error' => $e->getMessage()
             ], 500);
-        }
-    }
-
-    /**
-     * Función auxiliar para registrar en bitácora
-     */
-    private function registrarBitacora($accion)
-    {
-        try {
-            DB::table('bitacora')->insert([
-                'id_perfil_usuario' => auth()->user()->id_perfil_usuario ?? 1, // temporal
-                'accion' => $accion,
-                'fecha' => now(),
-            ]);
-        } catch (\Throwable $e) {
-            \Log::error('Error al registrar bitácora: ' . $e->getMessage());
         }
     }
 }

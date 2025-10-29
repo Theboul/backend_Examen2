@@ -18,7 +18,7 @@ class Carrera extends Model
 
     protected $fillable = [
         'nombre',
-        'sigla',
+        'codigo',
         'duracion_anios',
         'activo'
     ];

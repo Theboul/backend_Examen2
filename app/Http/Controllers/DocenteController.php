@@ -153,13 +153,10 @@ class DocenteController extends Controller
             ]);
 
             // Registrar en bitácora
-            // Bitacora::create([
-            //     'tabla_afectada' => 'docente',
-            //     'operacion' => 'INSERT',
-            //     'registro_id' => $docente->cod_docente,
-            //     'usuario_id' => auth()->check() ? auth()->user()->id_perfil_usuario : null,
-            //     'descripcion' => "Docente creado: {$perfil->nombre_completo}"
-            // ]);
+            Bitacora::registrar(
+                'CREAR',
+                "Docente creado: {$perfil->nombre_completo} - Código: {$codigoDocente}"
+            );
 
             DB::commit();
 
@@ -283,13 +280,10 @@ class DocenteController extends Controller
             ]));
 
             // Registrar en bitácora
-            // Bitacora::create([
-            //     'tabla_afectada' => 'docente',
-            //     'operacion' => 'UPDATE',
-            //     'registro_id' => $docente->cod_docente,
-            //     'usuario_id' => auth()->check() ? auth()->user()->id_perfil_usuario : null,
-            //     'descripcion' => "Docente actualizado: {$docente->perfil->nombre_completo}"
-            // ]);
+            Bitacora::registrar(
+                'ACTUALIZAR',
+                "Docente actualizado: {$docente->perfil->nombre_completo} - Código: {$docente->cod_docente}"
+            );
 
             DB::commit();
 
@@ -327,13 +321,10 @@ class DocenteController extends Controller
             $docente->update(['activo' => false]);
 
             // Registrar en bitácora
-            // Bitacora::create([
-            //     'tabla_afectada' => 'docente',
-            //     'operacion' => 'DELETE',
-            //     'registro_id' => $docente->cod_docente,
-            //     'usuario_id' => auth()->check() ? auth()->user()->id_perfil_usuario : null,
-            //     'descripcion' => "Docente desactivado: {$docente->perfil->nombre_completo}"
-            // ]);
+            Bitacora::registrar(
+                'DESACTIVAR',
+                "Docente desactivado: {$docente->perfil->nombre_completo} - Código: {$docente->cod_docente}"
+            );
 
             return response()->json([
                 'success' => true,
@@ -359,13 +350,10 @@ class DocenteController extends Controller
             $docente->update(['activo' => true]);
 
             // Registrar en bitácora
-            // Bitacora::create([
-            //     'tabla_afectada' => 'docente',
-            //     'operacion' => 'UPDATE',
-            //     'registro_id' => $docente->cod_docente,
-            //     'usuario_id' => auth()->check() ? auth()->user()->id_perfil_usuario : null,
-            //     'descripcion' => "Docente reactivado: {$docente->perfil->nombre_completo}"
-            // ]);
+            Bitacora::registrar(
+                'REACTIVAR',
+                "Docente reactivado: {$docente->perfil->nombre_completo} - Código: {$docente->cod_docente}"
+            );
 
             return response()->json([
                 'success' => true,

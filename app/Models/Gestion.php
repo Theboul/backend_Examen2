@@ -54,4 +54,27 @@ class Gestion extends Model
     {
         return $query->where('activo', true);
     }
+
+    /**
+     * Scope para gestiones inactivas
+     */
+    public function scopeInactivas($query)
+    {
+        return $query->where('activo', false);
+    }
+
+    /**
+     * Verificar si la gestión puede ser desactivada
+     */
+    public function puedeDesactivarse(): bool
+    {
+        // Una gestión activa no puede desactivarse directamente
+        // Primero debe activarse otra gestión
+        if ($this->activo) {
+            return false;
+        }
+        
+        // Las gestiones inactivas siempre pueden "desactivarse" (ya lo están)
+        return true;
+    }
 }

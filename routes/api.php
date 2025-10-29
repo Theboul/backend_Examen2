@@ -29,13 +29,17 @@ Route::get('/test', function () {
 // ========== AUTENTICACIÓN (Públicas) ==========
 Route::prefix('/auth')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);
-    Route::post('/logout', [AuthController::class, 'logout'])->middleware('role:Administrador,Coordinador,Docente,Autoridad');
-    Route::post('/cambiar-password', [AuthController::class, 'cambiarPasswordPrimerIngreso'])->middleware('role:Administrador,Coordinador,Docente,Autoridad');
-    Route::post('/toggle-activo/{id}', [AuthController::class, 'toggleActivoCuenta'])->middleware('role:Administrador');
+    
+    // Rutas protegidas con Sanctum
+    Route::middleware('auth:sanctum')->group(function () {
+        Route::post('/logout', [AuthController::class, 'logout']);
+        Route::post('/cambiar-password', [AuthController::class, 'cambiarPasswordPrimerIngreso']);
+        Route::post('/toggle-activo/{id}', [AuthController::class, 'toggleActivoCuenta'])->middleware('role:Administrador');
+    });
 });
 
 // ========== RUTAS PARA ADMINISTRADOR ==========
-Route::middleware(['role:Administrador'])->group(function () {
+Route::middleware(['auth:sanctum', 'role:Administrador'])->group(function () {
     
     // Gestiones - CRUD Completo (Solo Admin)
     Route::prefix('/gestiones')->group(function () {
@@ -45,6 +49,7 @@ Route::middleware(['role:Administrador'])->group(function () {
         Route::put('/{id}', [GestionController::class, 'update']);
         Route::post('/{id}/activar', [GestionController::class, 'activar']);
         Route::delete('/{id}', [GestionController::class, 'destroy']);
+        Route::post('/{id}/reactivar', [GestionController::class, 'reactivar']);
     });
 
     // Carreras - CRUD Completo (Solo Admin)
@@ -94,7 +99,7 @@ Route::middleware(['role:Administrador'])->group(function () {
 });
 
 // ========== RUTAS PARA ADMINISTRADOR Y COORDINADOR ==========
-Route::middleware(['role:Administrador,Coordinador'])->group(function () {
+Route::middleware(['auth:sanctum', 'role:Administrador,Coordinador'])->group(function () {
     
     // Grupos - CRUD (Admin y Coordinador)
     Route::prefix('/grupos')->group(function () {
@@ -109,7 +114,7 @@ Route::middleware(['role:Administrador,Coordinador'])->group(function () {
 });
 
 // ========== RUTAS PARA COORDINADOR Y AUTORIDAD (Solo Lectura) ==========
-Route::middleware(['role:Coordinador,Autoridad'])->group(function () {
+Route::middleware(['auth:sanctum', 'role:Coordinador,Autoridad'])->group(function () {
     
     // Consulta de Gestiones
     Route::get('/gestiones/consulta', [GestionController::class, 'index']);

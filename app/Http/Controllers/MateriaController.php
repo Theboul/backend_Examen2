@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Materia;
+use App\Models\Bitacora;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
@@ -67,7 +68,11 @@ class MateriaController extends Controller
         DB::beginTransaction();
 
         $materia = Materia::create($validated + ['activo' => true]);
-        //$this->registrarBitacora('Materia creada: ' . $materia->sigla . ' - ' . $materia->nombre);
+        
+        Bitacora::registrar(
+            'CREAR',
+            "Materia creada: {$materia->sigla} - {$materia->nombre} (ID: {$materia->id_materia})"
+        );
 
         DB::commit();
 
@@ -100,7 +105,12 @@ class MateriaController extends Controller
 
         DB::beginTransaction();
         $materia->update($validated);
-        //$this->registrarBitacora('Materia actualizada: ' . $materia->sigla . ' - ' . $materia->nombre);
+        
+        Bitacora::registrar(
+            'ACTUALIZAR',
+            "Materia actualizada: {$materia->sigla} - {$materia->nombre} (ID: {$materia->id_materia})"
+        );
+        
         DB::commit();
 
         return response()->json([
@@ -132,7 +142,12 @@ class MateriaController extends Controller
 
         DB::beginTransaction();
         $materia->update(['activo' => false]);
-        //$this->registrarBitacora('Materia desactivada: ' . $materia->sigla . ' - ' . $materia->nombre);
+        
+        Bitacora::registrar(
+            'DESACTIVAR',
+            "Materia desactivada: {$materia->sigla} - {$materia->nombre} (ID: {$materia->id_materia})"
+        );
+        
         DB::commit();
 
         return response()->json(['success' => true, 'message' => 'Materia desactivada exitosamente']);
@@ -150,7 +165,12 @@ class MateriaController extends Controller
 
         DB::beginTransaction();
         $materia->update(['activo' => true]);
-        //$this->registrarBitacora('Materia reactivada: ' . $materia->sigla . ' - ' . $materia->nombre);
+        
+        Bitacora::registrar(
+            'REACTIVAR',
+            "Materia reactivada: {$materia->sigla} - {$materia->nombre} (ID: {$materia->id_materia})"
+        );
+        
         DB::commit();
 
         return response()->json([
@@ -176,21 +196,5 @@ class MateriaController extends Controller
         ]);
 
         return response()->json(['success' => true, 'data' => $items]);
-    }
-
-    /**
-     * Registrar acción en bitácora.
-     */
-    private function registrarBitacora($accion)
-    {
-        try {
-            DB::table('bitacora')->insert([
-                'id_perfil_usuario' => auth()->user()->id_perfil_usuario ?? 1, // temporal
-                'accion' => $accion,
-                'fecha' => now(),
-            ]);
-        } catch (\Throwable $e) {
-            \Log::error('Error al registrar bitácora: ' . $e->getMessage());
-        }
     }
 }

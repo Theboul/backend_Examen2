@@ -111,13 +111,10 @@ class GrupoController extends Controller
             $grupo = Grupo::create($data);
 
             // Registrar en bitácora
-            /**Bitacora::create([
-                'tabla_afectada' => 'grupo',
-                'operacion' => 'INSERT',
-                'registro_id' => $grupo->id_grupo,
-                'usuario_id' => auth()->check() ? auth()->user()->id_perfil_usuario : null,
-                'descripcion' => "Grupo creado: {$grupo->nombre}"
-            ]);**/
+            Bitacora::registrar(
+                'CREAR',
+                "Grupo creado: {$grupo->nombre} - ID: {$grupo->id_grupo}"
+            );
 
             return response()->json([
                 'success' => true,
@@ -208,13 +205,10 @@ class GrupoController extends Controller
             ]));
 
             // Registrar en bitácora
-            /**Bitacora::create([
-                'tabla_afectada' => 'grupo',
-                'operacion' => 'UPDATE',
-                'registro_id' => $grupo->id_grupo,
-                'usuario_id' => auth()->check() ? auth()->user()->id_perfil_usuario : null,
-                'descripcion' => "Grupo actualizado: {$grupo->nombre}"
-            ]);**/
+            Bitacora::registrar(
+                'ACTUALIZAR',
+                "Grupo actualizado: {$grupo->nombre} - ID: {$grupo->id_grupo}"
+            );
 
             return response()->json([
                 'success' => true,
@@ -249,13 +243,10 @@ class GrupoController extends Controller
             $grupo->update(['activo' => false]);
 
             // Registrar en bitácora
-            /**Bitacora::create([
-                'tabla_afectada' => 'grupo',
-                'operacion' => 'DELETE',
-                'registro_id' => $grupo->id_grupo,
-                'usuario_id' => auth()->check() ? auth()->user()->id_perfil_usuario : null,
-                'descripcion' => "Grupo desactivado: {$grupo->nombre}"
-            ]);**/
+            Bitacora::registrar(
+                'DESACTIVAR',
+                "Grupo desactivado: {$grupo->nombre} - ID: {$grupo->id_grupo}"
+            );
 
             return response()->json([
                 'success' => true,
@@ -295,13 +286,10 @@ class GrupoController extends Controller
             $grupo->update(['activo' => true]);
 
             // Registrar en bitácora
-            /**Bitacora::create([
-                'tabla_afectada' => 'grupo',
-                'operacion' => 'UPDATE',
-                'registro_id' => $grupo->id_grupo,
-                'usuario_id' => auth()->check() ? auth()->user()->id_perfil_usuario : null,
-                'descripcion' => "Grupo reactivado: {$grupo->nombre}"
-            ]);**/
+            Bitacora::registrar(
+                'REACTIVAR',
+                "Grupo reactivado: {$grupo->nombre} - ID: {$grupo->id_grupo}"
+            );
 
             return response()->json([
                 'success' => true,

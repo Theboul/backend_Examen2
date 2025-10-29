@@ -6,11 +6,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, HasApiTokens;
 
     protected $table = 'users';
     protected $primaryKey = 'id_usuario';
@@ -53,7 +54,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'activo' => 'boolean',
-            'primer_ingreso' => 'boolean',
+            'primer_ingreso' => 'datetime',
             'fecha_creacion' => 'datetime',
             'fecha_modificacion' => 'datetime',
             'ultimo_acceso' => 'datetime',
@@ -66,9 +67,15 @@ class User extends Authenticatable
         return $this->belongsTo(Rol::class, 'id_rol');
     }
 
-    public function perfilUsuario()
+    public function perfil()
     {
         return $this->hasOne(PerfilUsuario::class, 'id_usuario');
+    }
+
+    // Alias para compatibilidad (deprecado, usar perfil())
+    public function perfilUsuario()
+    {
+        return $this->perfil();
     }
 
     public function docente()

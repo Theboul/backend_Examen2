@@ -22,3 +22,23 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# Archivos de documentación interna (no necesarios en producción)
+AUDITORIA_CODIGO.md
+BITACORA_CORRECCIONES.md
+PRUEBAS_ROLES.md
+SOLUCION_ERROR_GESTION.md
+INICIO_RAPIDO.md
+GUIA_PRUEBAS.md
+verificacion_bd.sql
+fix_gestion_constraint.sql
+
+# Archivos de pruebas locales
+tests_api.http
+*.http
+
+# Scripts de preparación
+prepare-railway.sh
+
+# README duplicado
+README_COMPLETO.md

@@ -71,7 +71,7 @@ class AuthController extends Controller
             ]);
 
             // Cargar relaciones
-            $user->load('perfilUsuario', 'docente');
+            $user->load('perfil', 'docente', 'rol');
 
             // Verificar si es primer ingreso
             $primerIngreso = $user->primer_ingreso === null;
@@ -80,8 +80,8 @@ class AuthController extends Controller
                 $user->update(['primer_ingreso' => now()]);
             }
 
-            // Generar token (por ahora simulado, después implementarás Laravel Sanctum)
-            $token = base64_encode($user->id_usuario . ':' . now()->timestamp);
+            // Crear token con Sanctum (expira en 2 horas)
+            $token = $user->createToken('auth-token')->plainTextToken;
 
             return response()->json([
                 'success' => true,
@@ -92,12 +92,15 @@ class AuthController extends Controller
                         'usuario' => $user->usuario,
                         'email' => $user->email,
                         'id_rol' => $user->id_rol,
-                        'perfil' => $user->perfilUsuario,
+                        'rol' => $user->rol->nombre,
+                        'perfil' => $user->perfil,
                         'docente' => $user->docente,
                     ],
                     'token' => $token,
+                    'token_type' => 'Bearer',
+                    'expires_in' => 120, // minutos (2 horas)
                     'primer_ingreso' => $primerIngreso,
-                    'debe_cambiar_password' => $primerIngreso, // Forzar cambio en primer ingreso
+                    'debe_cambiar_password' => $primerIngreso,
                 ]
             ], 200);
 
@@ -141,7 +144,9 @@ class AuthController extends Controller
      */
     public function logout(Request $request)
     {
-        // TODO: Implementar invalidación de token con Laravel Sanctum
+        // Revocar el token actual del usuario autenticado
+        $request->user()->currentAccessToken()->delete();
+
         return response()->json([
             'success' => true,
             'message' => 'Sesión cerrada exitosamente'

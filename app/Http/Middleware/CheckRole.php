@@ -16,46 +16,19 @@ class CheckRole
      */
     public function handle(Request $request, Closure $next, string ...$roles): Response
     {
-        // Por ahora, como no tenemos autenticación real, validamos que venga el token
-        $token = $request->header('Authorization');
-        
-        if (!$token) {
-            return response()->json([
-                'success' => false,
-                'message' => 'No autorizado. Token requerido.'
-            ], 401);
-        }
-
-        // Decodificar el token temporal (base64)
-        $token = str_replace('Bearer ', '', $token);
-        $decoded = base64_decode($token);
-        
-        if (!$decoded) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Token inválido'
-            ], 401);
-        }
-
-        // Extraer id_usuario del token (formato: "id_usuario:timestamp")
-        $parts = explode(':', $decoded);
-        if (count($parts) !== 2) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Token con formato inválido'
-            ], 401);
-        }
-
-        $idUsuario = $parts[0];
-
-        // Buscar el usuario con su rol
-        $user = \App\Models\User::with('rol')->find($idUsuario);
+        // Obtener usuario autenticado por Sanctum
+        $user = $request->user();
 
         if (!$user) {
             return response()->json([
                 'success' => false,
-                'message' => 'Usuario no encontrado'
+                'message' => 'No autorizado. Token requerido o expirado.'
             ], 401);
+        }
+
+        // Cargar rol si no está cargado
+        if (!$user->relationLoaded('rol')) {
+            $user->load('rol');
         }
 
         // Verificar si la cuenta está activa
@@ -81,9 +54,6 @@ class CheckRole
                 'rol_usuario' => $nombreRol
             ], 403);
         }
-
-        // Agregar el usuario al request para usarlo en los controladores
-        $request->attributes->set('user', $user);
 
         return $next($request);
     }

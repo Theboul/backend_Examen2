@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Carrera;
+use App\Models\Bitacora;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
@@ -81,11 +82,10 @@ class CarreraController extends Controller
             ]);
 
             // Registrar en bitácora
-
-            /**BitacoraController::registrar(
+            Bitacora::registrar(
                 'CREAR',
-                'Carrera creada: ' . $carrera->nombre
-            );**/
+                "Carrera creada: {$carrera->nombre} ({$carrera->codigo}) - ID: {$carrera->id_carrera}"
+            );
             
             DB::commit();
 
@@ -180,10 +180,11 @@ class CarreraController extends Controller
                 'duracion_anios' => $request->duracion_anios
             ]);
 
-            /**BitacoraController::registrar(
+            // Registrar en bitácora
+            Bitacora::registrar(
                 'ACTUALIZAR',
-                'Carrera actualizada: ' . $carrera->nombre
-            );**/
+                "Carrera actualizada: {$carrera->nombre} ({$carrera->codigo}) - ID: {$carrera->id_carrera}"
+            );
 
             DB::commit();
 
@@ -231,12 +232,11 @@ class CarreraController extends Controller
             // Desactivar (soft delete)
             $carrera->update(['activo' => false]);
 
-            $this->registrarBitacora('Carrera desactivada: ' . $carrera->nombre);
-
-            /**BitacoraController::registrar(
-                'ELIMINAR',
-                'Carrera Eliminada: ' . $carrera->nombre
-            );**/
+            // Registrar en bitácora
+            Bitacora::registrar(
+                'DESACTIVAR',
+                "Carrera desactivada: {$carrera->nombre} ({$carrera->codigo}) - ID: {$carrera->id_carrera}"
+            );
 
             DB::commit();
 
@@ -274,10 +274,11 @@ class CarreraController extends Controller
 
             $carrera->update(['activo' => true]);
 
-            /**BitacoraController::registrar(
+            // Registrar en bitácora
+            Bitacora::registrar(
                 'REACTIVAR',
-                'Carrera reactivada: ' . $carrera->nombre
-            );**/
+                "Carrera reactivada: {$carrera->nombre} ({$carrera->codigo}) - ID: {$carrera->id_carrera}"
+            );
 
             DB::commit();
 

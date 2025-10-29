@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\BitacoraController; 
 use App\Models\Gestion;
+use App\Models\Bitacora;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -66,10 +66,11 @@ class GestionController extends Controller
 
             $gestion = Gestion::create(array_merge($validated, ['activo' => false]));
             
-            /**BitacoraController::registrar(
+            // Registrar en bitácora
+            Bitacora::registrar(
                 'CREAR',
-                'Se creó la gestión: ' . $gestion->anio . '-' . $gestion->semestre
-            );**/
+                "Gestión creada: {$gestion->anio}-{$gestion->semestre} (ID: {$gestion->id_gestion})"
+            );
 
             DB::commit();
 
@@ -97,7 +98,7 @@ class GestionController extends Controller
     }
 
     /**
-     * Activar una gestión
+     * Activar una gestión (y desactivar las demás automáticamente)
      */
     public function activar($id)
     {
@@ -108,10 +109,11 @@ class GestionController extends Controller
             
             $gestion->activar();
             
-            /**BitacoraController::registrar(
+            // Registrar en bitácora
+            Bitacora::registrar(
                 'ACTIVAR',
-                'Gestión activada: ' . $gestion->anio . '-' . $gestion->semestre
-            );**/
+                "Gestión activada: {$gestion->anio}-{$gestion->semestre} (ID: {$gestion->id_gestion})"
+            );
 
             DB::commit();
 
@@ -126,6 +128,44 @@ class GestionController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Error al activar la gestión',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Reactivar una gestión previamente desactivada
+     */
+    public function reactivar($id)
+    {
+        try {
+            $gestion = Gestion::where('activo', false)->findOrFail($id);
+            
+            DB::beginTransaction();
+            
+            // Solo marcar como activa sin afectar otras gestiones
+            // (usar activar() si quieres que sea la única activa)
+            $gestion->update(['activo' => true]);
+            
+            // Registrar en bitácora
+            Bitacora::registrar(
+                'REACTIVAR',
+                "Gestión reactivada: {$gestion->anio}-{$gestion->semestre} (ID: {$gestion->id_gestion})"
+            );
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Gestión reactivada exitosamente',
+                'data' => $gestion
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al reactivar la gestión',
                 'error' => $e->getMessage()
             ], 500);
         }
@@ -161,7 +201,7 @@ class GestionController extends Controller
     }
 
     /**
-     * Eliminar una gestión (solo si NO está activa)
+     * Desactivar una gestión (eliminación lógica - solo si NO está activa)
      */
     public function destroy($id)
     {
@@ -171,31 +211,41 @@ class GestionController extends Controller
             if ($gestion->activo) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'No se puede eliminar la gestión activa. Active otra gestión primero.'
+                    'message' => 'No se puede desactivar la gestión activa. Active otra gestión primero.'
+                ], 400);
+            }
+
+            // Verificar si ya está inactiva
+            if (!$gestion->activo) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'La gestión ya está desactivada'
                 ], 400);
             }
 
             DB::beginTransaction();
             
-            /**BitacoraController::registrar(
-                'ELIMINAR',
-                'Gestión eliminada: ' . $gestion->anio . '-' . $gestion->semestre
-            );**/
-
-            $gestion->delete();
+            // Desactivar (eliminación lógica)
+            $gestion->update(['activo' => false]);
+            
+            // Registrar en bitácora
+            Bitacora::registrar(
+                'DESACTIVAR',
+                "Gestión desactivada: {$gestion->anio}-{$gestion->semestre} (ID: {$gestion->id_gestion})"
+            );
             
             DB::commit();
 
             return response()->json([
                 'success' => true,
-                'message' => 'Gestión eliminada exitosamente'
+                'message' => 'Gestión desactivada exitosamente'
             ]);
 
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json([
                 'success' => false,
-                'message' => 'Error al eliminar la gestión',
+                'message' => 'Error al desactivar la gestión',
                 'error' => $e->getMessage()
             ], 500);
         }
@@ -233,21 +283,12 @@ class GestionController extends Controller
             
             $gestion->update($validated);
            
-            /**BitacoraController::registrar(
+            // Registrar en bitácora
+            Bitacora::registrar(
                 'ACTUALIZAR',
-                'Gestión actualizada: ' . $gestion->anio . '-' . $gestion->semestre
-            );**/
+                "Gestión actualizada: {$gestion->anio}-{$gestion->semestre} (ID: {$gestion->id_gestion})"
+            );
 
-            DB::commit();
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Gestión actualizada exitosamente',
-                'data' => $gestion
-            ]);
-
-        } catch (\Exception $e) {
-            
             DB::commit();
 
             return response()->json([
