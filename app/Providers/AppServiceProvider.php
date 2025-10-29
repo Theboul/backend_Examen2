@@ -22,7 +22,11 @@ class AppServiceProvider extends ServiceProvider
     {
         // Configurar zona horaria para PostgreSQL
         if (config('database.default') === 'pgsql') {
-            DB::statement("SET TIME ZONE 'America/La_Paz'");
+            try {
+                DB::statement("SET TIME ZONE 'America/La_Paz'");
+            } catch (\Exception $e) {
+                // Ignorar si la BD no está disponible durante el build
+            }
         }
     }
 }
