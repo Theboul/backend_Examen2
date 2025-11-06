@@ -15,13 +15,21 @@ return [
     |
     */
 
+
     'paths' => ['api/*', 'sanctum/csrf-cookie'],
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['*'], // En desarrollo permite todos. En producción especifica: ['http://localhost:5173']
+    // Especifica los orígenes exactos
+    'allowed_origins' => [
+        'http://localhost:5173',              // Desarrollo local
+        'http://localhost:3000',              // Por si usas otro puerto
+        'https://gestion-academica-nu.vercel.app/', // Producción Vercel
+    ],
 
-    'allowed_origins_patterns' => [],
+    'allowed_origins_patterns' => [
+        '/^https:\/\/.*\.vercel\.app$/',      // Permite todos los subdominios de Vercel
+    ],
 
     'allowed_headers' => ['*'],
 
@@ -29,6 +37,7 @@ return [
 
     'max_age' => 0,
 
-    'supports_credentials' => false,
+    //Debe ser true para Sanctum
+    'supports_credentials' => true,
 
 ];
