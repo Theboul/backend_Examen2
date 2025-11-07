@@ -9,6 +9,7 @@ use App\Http\Controllers\AulaController;
 use App\Http\Controllers\GrupoController;
 use App\Http\Controllers\DocenteController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\TipoAulaController;
 
 /*
 |--------------------------------------------------------------------------
@@ -84,6 +85,13 @@ Route::middleware(['auth:sanctum', 'role:Administrador'])->group(function () {
         Route::delete('/{id}', [AulaController::class, 'destroy']);
         Route::post('/{id}/reactivar', [AulaController::class, 'reactivar']);
         Route::post('/{id}/toggle-mantenimiento', [AulaController::class, 'toggleMantenimiento']);
+    });
+
+    Route::prefix('/tipo-aulas')->group(function () {
+        Route::get('/', [TipoAulaController::class, 'index']);
+        Route::get('/select', [TipoAulaController::class, 'paraSelect']);
+        Route::post('/', [TipoAulaController::class, 'store']);
+        Route::put('/{id}', [TipoAulaController::class, 'update']);
     });
 
     // Docentes - CRUD Completo (Solo Admin)
