@@ -1,0 +1,6 @@
+nombres,apellidos,ci,email,rol,telefono,fecha_nacimiento,genero,titulo,especialidad,grado_academico,tipo_contrato,fecha_ingreso
+Juan Carlos,Pérez García,12345678,juan.perez@example.com,Docente,76543210,1985-05-15,M,Ingeniero de Sistemas,Programación Web,Maestría,Tiempo Completo,2025-01-15
+María Elena,López Fernández,87654321,maria.lopez@example.com,Coordinador,78901234,1990-08-20,F,,,,,,
+Pedro,Ramírez Torres,11223344,pedro.ramirez@example.com,Autoridad,79012345,1980-12-10,M,,,,,,
+Ana,Gonzales Rojas,55667788,ana.gonzales@example.com,Docente,77654321,1988-03-25,F,Licenciada en Matemáticas,Álgebra,Licenciatura,Medio Tiempo,2025-02-01
+Roberto,Silva Morales,99887766,roberto.silva@example.com,Docente,75432109,1992-11-30,M,Ingeniero Civil,Estructuras,Doctorado,Tiempo Completo,2025-01-20

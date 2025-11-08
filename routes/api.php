@@ -10,6 +10,8 @@ use App\Http\Controllers\GrupoController;
 use App\Http\Controllers\DocenteController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\TipoAulaController;
+use App\Http\Controllers\CargaMasivaController;
+use App\Http\Controllers\AsignacionDocenteController;
 
 /*
 |--------------------------------------------------------------------------
@@ -104,6 +106,11 @@ Route::middleware(['auth:sanctum', 'role:Administrador'])->group(function () {
         Route::delete('/{id}', [DocenteController::class, 'destroy']);
         Route::post('/{id}/reactivar', [DocenteController::class, 'reactivar']);
     });
+
+    // Carga Masiva de Usuarios (Solo Admin)
+    Route::prefix('/usuarios')->group(function () {
+        Route::post('/carga-masiva', [CargaMasivaController::class, 'cargarUsuarios']);
+    });
 });
 
 // ========== RUTAS PARA ADMINISTRADOR Y COORDINADOR ==========
@@ -119,6 +126,18 @@ Route::middleware(['auth:sanctum', 'role:Administrador,Coordinador'])->group(fun
         Route::delete('/{id}', [GrupoController::class, 'destroy']);
         Route::post('/{id}/reactivar', [GrupoController::class, 'reactivar']);
     });
+
+    // Asignación de Docentes a Materia-Grupo (Admin y Coordinador)
+    Route::prefix('/asignaciones-docente')->group(function () {
+        Route::get('/', [AsignacionDocenteController::class, 'index']); // Listar asignaciones
+        Route::post('/', [AsignacionDocenteController::class, 'store']); // Crear asignación
+        Route::get('/{id}', [AsignacionDocenteController::class, 'show']); // Ver detalle de asignación
+        Route::put('/{id}', [AsignacionDocenteController::class, 'update']); // Actualizar horas asignadas
+        Route::delete('/{id}', [AsignacionDocenteController::class, 'destroy']); // Desactivar asignación
+    });
+
+    // Carga horaria de docentes (Admin y Coordinador)
+    Route::get('/docentes/{cod_docente}/carga-horaria', [AsignacionDocenteController::class, 'cargaHoraria']);
 });
 
 // ========== RUTAS PARA COORDINADOR Y AUTORIDAD (Solo Lectura) ==========
