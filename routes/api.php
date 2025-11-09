@@ -2,16 +2,20 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\GestionController;
-use App\Http\Controllers\CarreraController;
-use App\Http\Controllers\MateriaController;
-use App\Http\Controllers\AulaController;
-use App\Http\Controllers\GrupoController;
-use App\Http\Controllers\DocenteController;
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\TipoAulaController;
-use App\Http\Controllers\CargaMasivaController;
-use App\Http\Controllers\AsignacionDocenteController;
+use App\Http\Controllers\Sistema\GestionController;
+use App\Http\Controllers\Maestros\CarreraController;
+use App\Http\Controllers\Maestros\MateriaController;
+use App\Http\Controllers\Maestros\AulaController;
+use App\Http\Controllers\Maestros\GrupoController;
+use App\Http\Controllers\Usuarios\DocenteController;
+use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\Maestros\TipoAulaController;
+use App\Http\Controllers\Usuarios\CargaMasivaController;
+use App\Http\Controllers\Horarios\AsignacionDocenteController;
+use App\Http\Controllers\Horarios\DiaController;
+use App\Http\Controllers\Horarios\BloqueHorarioController;
+use App\Http\Controllers\Maestros\TipoClaseController;
+use App\Http\Controllers\Horarios\HorarioClaseController;
 
 /*
 |--------------------------------------------------------------------------
@@ -82,6 +86,12 @@ Route::middleware(['auth:sanctum', 'role:Administrador'])->group(function () {
         Route::get('/', [AulaController::class, 'index']);
         Route::post('/', [AulaController::class, 'store']);
         Route::get('/select', [AulaController::class, 'getAulasForSelect']);
+        
+        // CU8: Consultar disponibilidad de aulas (requiere middleware propio abajo)
+        Route::get('/disponibilidad', [AulaController::class, 'consultarDisponibilidad'])
+            ->withoutMiddleware('role:Administrador')
+            ->middleware('role:Administrador,Coordinador');
+        
         Route::get('/{id}', [AulaController::class, 'show']);
         Route::put('/{id}', [AulaController::class, 'update']);
         Route::delete('/{id}', [AulaController::class, 'destroy']);
@@ -140,6 +150,46 @@ Route::middleware(['auth:sanctum', 'role:Administrador,Coordinador'])->group(fun
     Route::get('/docentes/{cod_docente}/carga-horaria', [AsignacionDocenteController::class, 'cargaHoraria']);
 });
 
+// RUTAS DE CATALOGO DIA-BLOQUEHORARIO-TIPOAULA
+Route::middleware(['auth:sanctum', 'role:Administrador,Coordinador'])->group(function () {
+    // Catálogos para dropdowns
+    Route::get('/dias/select', [DiaController::class, 'paraSelect']);
+    Route::get('/bloques-horario/select', [BloqueHorarioController::class, 'paraSelect']);
+    Route::get('/tipos-clase/select', [TipoClaseController::class, 'paraSelect']);
+
+    // CU6: Asignación Manual de Horarios
+    Route::prefix('/horarios-clase')->group(function () {
+        Route::get('/', [HorarioClaseController::class, 'index']);      // Listar
+        Route::post('/', [HorarioClaseController::class, 'store']);     // Crear (CU6)
+        
+        // CU7: Generación Automática (DEBE IR ANTES DE LAS RUTAS CON {id})
+        Route::post('/generar-automatico', [HorarioClaseController::class, 'generarAutomatico']);
+        
+        Route::get('/{id}', [HorarioClaseController::class, 'show']);   // Ver detalle
+        Route::put('/{id}', [HorarioClaseController::class, 'update']); // Actualizar
+        Route::delete('/{id}', [HorarioClaseController::class, 'destroy']); // Eliminar
+        Route::post('/{id}/reactivar', [HorarioClaseController::class, 'reactivar']); // Reactivar
+    });
+    
+    // CU12: Visualizar Horarios Semanales (Admin, Coordinador y Autoridad)
+    Route::get('/horarios/semanal', [HorarioClaseController::class, 'visualizarSemanal'])
+        ->withoutMiddleware('role:Administrador,Coordinador')
+        ->middleware('role:Administrador,Coordinador,Autoridad');
+
+    // CU17: Gestión de Estados de Horarios
+    Route::put('/horarios/aprobar', [HorarioClaseController::class, 'aprobarHorarios']); // BORRADOR → APROBADA
+    Route::put('/horarios/publicar', [HorarioClaseController::class, 'publicarHorarios']) // APROBADA → PUBLICADA
+        ->withoutMiddleware('role:Administrador,Coordinador')
+        ->middleware('role:Administrador,Coordinador,Autoridad');
+});
+
+// ========== RUTAS PARA DOCENTE ==========
+Route::middleware(['auth:sanctum', 'role:Docente'])->group(function () {
+    // CU10: Consultar Carga Horaria Personal
+    Route::get('/docente/horarios-personales', [HorarioClaseController::class, 'cargaHorariaPersonal']);
+});
+
+
 // ========== RUTAS PARA COORDINADOR Y AUTORIDAD (Solo Lectura) ==========
 Route::middleware(['auth:sanctum', 'role:Coordinador,Autoridad'])->group(function () {
     
@@ -158,8 +208,10 @@ Route::middleware(['auth:sanctum', 'role:Coordinador,Autoridad'])->group(functio
     // Consulta de Aulas
     Route::get('/aulas/consulta', [AulaController::class, 'index']);
     Route::get('/aulas/select/consulta', [AulaController::class, 'getAulasForSelect']);
-    
+    // CU8: Disponibilidad ya definida en el grupo de Admin con permisos extendidos
+
     // Consulta de Docentes
     Route::get('/docentes/consulta', [DocenteController::class, 'index']);
     Route::get('/docentes/select/consulta', [DocenteController::class, 'getDocentesForSelect']);
+
 });

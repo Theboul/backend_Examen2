@@ -2,12 +2,12 @@
 
 namespace App\Services;
 
-use App\Models\User;
-use App\Models\PerfilUsuario;
-use App\Models\Rol;
-use App\Models\Docente;
-use App\Models\TipoContrato;
-use App\Models\Bitacora;
+use App\Models\Usuarios\User;
+use App\Models\Usuarios\PerfilUsuario;
+use App\Models\Usuarios\Rol;
+use App\Models\Usuarios\Docente;
+use App\Models\Maestros\TipoContrato;
+use App\Models\Sistema\Bitacora;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
