@@ -16,6 +16,10 @@ use App\Http\Controllers\Horarios\DiaController;
 use App\Http\Controllers\Horarios\BloqueHorarioController;
 use App\Http\Controllers\Maestros\TipoClaseController;
 use App\Http\Controllers\Horarios\HorarioClaseController;
+use App\Http\Controllers\Horarios\AsistenciaController;
+use App\Http\Controllers\Horarios\JustificacionController;
+use App\Http\Controllers\Admin\RevisionJustificacionController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -181,12 +185,35 @@ Route::middleware(['auth:sanctum', 'role:Administrador,Coordinador'])->group(fun
     Route::put('/horarios/publicar', [HorarioClaseController::class, 'publicarHorarios']) // APROBADA → PUBLICADA
         ->withoutMiddleware('role:Administrador,Coordinador')
         ->middleware('role:Administrador,Coordinador,Autoridad');
+
+
+    
+    //CU20 (Lado Admin/Coordinador) Revisión de justificaciones
+    Route::prefix('/admin/justificaciones')->group(function () {
+        // Listar todas las solicitudes pendientes
+        Route::get('/pendientes', [RevisionJustificacionController::class, 'indexPendientes']);
+        
+        // Aprobar o Rechazar una solicitud específica
+        Route::post('/{id}/revisar', [RevisionJustificacionController::class, 'revisar']);
+    });
 });
 
 // ========== RUTAS PARA DOCENTE ==========
 Route::middleware(['auth:sanctum', 'role:Docente'])->group(function () {
     // CU10: Consultar Carga Horaria Personal
     Route::get('/docente/horarios-personales', [HorarioClaseController::class, 'cargaHorariaPersonal']);
+
+    Route::prefix('/asistencia')->group(function () {
+        
+        // CU9 - Método 1: Botón de Asistencia
+        Route::post('/registrar', [AsistenciaController::class, 'registrarAsistencia']);
+        
+        //CU9 - Método 2: Escaneo de QR
+        Route::post('/registrar-qr', [AsistenciaController::class, 'registrarAsistenciaQR']);
+    });
+
+    //CU20 (Lado Docente) Enviar una justificación para una asistencia específica
+    Route::post('/asistencia/{id}/justificar', [JustificacionController::class, 'store']);
 });
 
 
