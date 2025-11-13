@@ -18,7 +18,8 @@ use App\Http\Controllers\Maestros\TipoClaseController;
 use App\Http\Controllers\Horarios\HorarioClaseController;
 use App\Http\Controllers\Horarios\AsistenciaController;
 use App\Http\Controllers\Horarios\JustificacionController;
-use App\Http\Controllers\Admin\RevisionJustificacionController;
+use App\Http\Controllers\Horarios\RevisionJustificacionController;
+use App\Http\Controllers\Sistema\BitacoraController;
 
 
 /*
@@ -124,6 +125,11 @@ Route::middleware(['auth:sanctum', 'role:Administrador'])->group(function () {
     // Carga Masiva de Usuarios (Solo Admin)
     Route::prefix('/usuarios')->group(function () {
         Route::post('/carga-masiva', [CargaMasivaController::class, 'cargarUsuarios']);
+    });
+
+    Route::prefix('/bitacora')->group(function () {
+        Route::get('/', [BitacoraController::class, 'index']);
+        Route::get('/report', [BitacoraController::class, 'getReport']);
     });
 });
 

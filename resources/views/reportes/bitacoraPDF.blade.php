@@ -6,7 +6,7 @@
     <style>
         body { font-family: DejaVu Sans, sans-serif; font-size: 12px; }
         table { width: 100%; border-collapse: collapse; }
-        th, td { border: 1px solid #333; padding: 4px; text-align: left; }
+        th, td { border: 1px solid #333; padding: 4px; text-align: left; word-wrap: break-word; }
         th { background: #eee; }
     </style>
 </head>
@@ -27,9 +27,12 @@
                 <tr>
                     <td>{{ $bitacora->accion }}</td>
                     <td>{{ $bitacora->descripcion }}</td>
-                    <td>{{ $bitacora->nombre_usuario }}</td>
-                    <td>{{ $bitacora->ip_origen }}</td>
-                    <td>{{ $bitacora->fecha_hora }}</td>
+                    
+                    <td>{{ $bitacora->nombre_usuario_plano ?? 'Anónimo' }}</td>
+                    
+                    <td>{{ $bitacora->ip ?? '-' }}</td>
+                    
+                    <td>{{ $bitacora->fecha ? \Carbon\Carbon::parse($bitacora->fecha)->format('d/m/Y H:i:s') : '-' }}</td>
                 </tr>
             @endforeach
         </tbody>

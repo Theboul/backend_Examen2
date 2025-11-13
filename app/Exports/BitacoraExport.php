@@ -20,9 +20,9 @@ class BitacoraExport implements FromCollection, WithHeadings
             return [
                 $b->accion,
                 $b->descripcion,
-                $b->nombre_usuario,
-                $b->ip_origen,
-                $b->fecha_hora,
+                $b->nombre_usuario_plano,
+                $b->ip,
+                $b->fecha,
             ];
         });
     }
