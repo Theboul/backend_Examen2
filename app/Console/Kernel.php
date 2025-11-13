@@ -12,16 +12,9 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        // ... (otros jobs que puedas tener) ...
-
-        /**
-         * REGISTRAR AUSENCIAS (CU20)
-         * Se ejecuta todos los días a las 23:50 (11:50 PM).
-         * (Justo antes de medianoche para capturar todas las clases del día)
-         */
-        $schedule->command('sis:registrar-ausencias')
-                 ->dailyAt('23:50')
-                 ->timezone('America/La_Paz'); // ¡Importante usar la zona horaria de Bolivia!
+        // 🎯 TEMPORAL - Para pruebas
+        $schedule->command('sis:registrar-ausencias')->everyMinute();
+        $schedule->command('test:scheduler')->everyMinute();
     }
 
     /**

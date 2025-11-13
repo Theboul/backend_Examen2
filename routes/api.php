@@ -19,6 +19,7 @@ use App\Http\Controllers\Horarios\HorarioClaseController;
 use App\Http\Controllers\Horarios\AsistenciaController;
 use App\Http\Controllers\Horarios\JustificacionController;
 use App\Http\Controllers\Admin\RevisionJustificacionController;
+use App\Http\Controllers\Sistema\BitacoraController;
 
 
 /*
@@ -241,4 +242,12 @@ Route::middleware(['auth:sanctum', 'role:Coordinador,Autoridad'])->group(functio
     Route::get('/docentes/consulta', [DocenteController::class, 'index']);
     Route::get('/docentes/select/consulta', [DocenteController::class, 'getDocentesForSelect']);
 
+});
+
+
+// =======================================================
+//  REPORTES DE ASISTENCIA (CU11)
+// =======================================================
+Route::middleware(['auth:sanctum', 'role:Administrador,Coordinador,Autoridad'])->group(function () {
+    Route::get('/bitacora', [BitacoraController::class, 'index']);
 });
